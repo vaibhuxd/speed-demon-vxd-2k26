@@ -1,5 +1,5 @@
-# The reference is scored exactly like a submission. Digest gets pinned with the toolchain allowlist.
-FROM python:3.13-slim@sha256:d98cc29d3266e535dd9da1099688d9cb3ca4753813571e071763d17725460962
-COPY . /app
+FROM gcc:14-bookworm
 WORKDIR /app
-ENTRYPOINT ["python3", "/app/run.py"]
+COPY solution.cpp /app/solution.cpp
+RUN g++ -O3 -march=x86-64-v3 -std=c++20 -pipe /app/solution.cpp -o /app/solution
+ENTRYPOINT ["/app/solution"]

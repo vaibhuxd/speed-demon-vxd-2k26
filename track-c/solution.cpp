@@ -1,0 +1,10 @@
+#include <bits/stdc++.h>
+using namespace std;
+struct CSV{ifstream f; CSV(string p):f(p,ios::binary){} bool row(vector<string>&r){r.clear();string s;bool quoted=false,any=false;char c;while(f.get(c)){any=true;if(quoted){if(c=='"'){if(f.peek()=='"'){f.get(c);s+='"';}else quoted=false;}else s+=c;}else{if(c=='"'&&s.empty())quoted=true;else if(c==','){r.push_back(s);s.clear();}else if(c=='\n'){r.push_back(s);if(!r.empty()&&!r.back().empty()&&r.back().back()=='\r')r.back().pop_back();return true;}else s+=c;}}if(any){r.push_back(s);return true;}return false;}};
+long long integer(string s){return stoll(s);} long long cents(string s){bool neg=s[0]=='-';if(neg)s.erase(0,1);auto p=s.find('.');long long v=stoll(s.substr(0,p))*100+stoll(s.substr(p+1));return neg?-v:v;}
+string money(long long x){bool n=x<0;if(n)x=-x;return string(n?"-":"")+to_string(x/100)+"."+ (x%100<10?"0":"")+to_string(x%100);}
+struct A{long long n=0,ids=0,sum=0,mn=LLONG_MAX,mx=LLONG_MIN,nb=0,tb=0;set<string> names;};
+int main(){unordered_map<long long,string> regions;CSV rf("/data/regions.csv");vector<string>r;if(!rf.row(r))return 2;if(r!=vector<string>{"region_id","country"})return 3;while(rf.row(r)){if(r.size()!=2)return 4;regions[integer(r[0])]=r[1];}
+ map<string,A> ag;CSV cf("/data/records.csv");if(!cf.row(r))return 5;if(!r.empty()&&r[0].substr(0,3)=="\xef\xbb\xbf")r[0].erase(0,3);if(r!=vector<string>{"id","name","note","region_id","amount"})return 6;
+ while(cf.row(r)){if(r.size()!=5)return 7;if(!r[0].empty()&&r[0].substr(0,3)=="\xef\xbb\xbf")r[0].erase(0,3);long long id=integer(r[0]),rid=integer(r[3]),v=cents(r[4]);string key=regions.count(rid)?regions[rid]:"_UNMATCHED";auto&a=ag[key];a.n++;a.ids+=id;a.sum+=v;a.mn=min(a.mn,v);a.mx=max(a.mx,v);a.names.insert(r[1]);a.nb+=r[1].size();a.tb+=r[2].size();}
+ filesystem::create_directories("/out");ofstream o("/out/aggregates.txt");for(auto&[k,a]:ag)o<<k<<" "<<a.n<<" "<<a.ids<<" "<<money(a.sum)<<" "<<money(a.mn)<<" "<<money(a.mx)<<" "<<a.names.size()<<" "<<a.nb<<" "<<a.tb<<"\n";}

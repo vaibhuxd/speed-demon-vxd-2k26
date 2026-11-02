@@ -1,5 +1,4 @@
-# Read by the board and the scoring harness.
 track = "b"
 team = "vxd"
-language = "Python"
+language = "C++20"
 dependency_count = 0
